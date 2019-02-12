@@ -22,12 +22,20 @@
 
         <!-- FirebaseInstanceIdService performs security checks at runtime,
       no need for explicit permissions despite exported="true"             -->
-        <service android:name=".MyFirebaseInstanceIdService" android:exported="true">
+        <service android:name=".fcm.SquawkFirebaseInstanceIdService" android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
 
+        <!--  FirebaseMessagingService sends messages and not notification to the user of the app
+        com.google.firebase.MESSAGING_EVENT -->
+        <service android:name=".fcm.SquawkFirebaseMessagingService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
         <provider
             android:name=".provider.generated.SquawkProvider"
             android:authorities="android.example.com.squawker.provider.provider"

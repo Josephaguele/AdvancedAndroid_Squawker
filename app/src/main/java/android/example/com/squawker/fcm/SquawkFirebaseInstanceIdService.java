@@ -7,8 +7,8 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 
 
 
-public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
-    private static final String TAG = MyFirebaseInstanceIdService.class.getSimpleName();
+public class SquawkFirebaseInstanceIdService extends FirebaseInstanceIdService {
+    private static final String TAG = SquawkFirebaseInstanceIdService.class.getSimpleName();
     /**
      * Called if InstanceID token is updated. This may occur if the security of
      * the previous token had been compromised. Note that this is called when the InstanceID token
