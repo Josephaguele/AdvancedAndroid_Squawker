@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements
         // Log and toast
         String msg = getString(R.string.refreshed_token) +  "  " + token;
         Log.d(LOG_TAG, msg);
-        Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
     }
 
     @Override

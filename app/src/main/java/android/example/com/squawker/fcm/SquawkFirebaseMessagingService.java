@@ -7,9 +7,12 @@ import android.example.com.squawker.MainActivity;
 import android.example.com.squawker.R;
 import android.example.com.squawker.provider.SquawkContract;
 import android.example.com.squawker.provider.SquawkProvider;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -33,6 +36,7 @@ public class SquawkFirebaseMessagingService extends FirebaseMessagingService {
     private static final String JSON_KEY_MESSAGE =      COLUMN_MESSAGE;
     private static final String JSON_KEY_DATE =         COLUMN_DATE;
     private static final int NOTIFICATION_MAX_CHARACTERS = 40;
+    private static final String LOG_TAG = "YAWA" ;
 
 
     //  (2) As part of the new Service - Override onMessageReceived. This method will
@@ -46,10 +50,31 @@ public class SquawkFirebaseMessagingService extends FirebaseMessagingService {
     // date: Ex. 1484358455343
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+        // There are two types of messages data messages and notification messages. Data messages
+        // are handled
+        // here in onMessageReceived whether the app is in the foreground or background. Data
+        // messages are the type
+        // traditionally used with FCM. Notification messages are only received here in
+        // onMessageReceived when the app
+        // is in the foreground. When the app is in the background an automatically generated
+        // notification is displayed.
+        // When the user taps on the notification they are returned to the app. Messages
+        // containing both notification
+        // and data payloads are treated as notification messages. The Firebase console always
+        // sends notification
+        // messages. For more see: https://firebase.google.com/docs/cloud-messaging/concept-options\
+
+        // The Squawk server always sends just *data* messages, meaning that onMessageReceived when
+        // the app is both in the foreground AND the background
+
         Map<String, String> data;
 
         data = remoteMessage.getData();
 
+        //Check if message contains a payload
+        if (data.size() > 0) {
+            Log.d(LOG_TAG, "Message data payload: " + data);
+        }
         insertSquawk(data);
         sendNotification(data);
     }
@@ -63,10 +88,10 @@ public class SquawkFirebaseMessagingService extends FirebaseMessagingService {
             @Override
             protected Void doInBackground(Void... voids) {
                 ContentValues values = new ContentValues();
-                values.put(COLUMN_AUTHOR, data.get(JSON_KEY_AUTHOR));
-                values.put(COLUMN_AUTHOR_KEY, data.get(JSON_KEY_AUTHOR_KEY));
-                values.put(COLUMN_MESSAGE,data.get(JSON_KEY_MESSAGE));
-                values.put(COLUMN_DATE, data.get(JSON_KEY_DATE));
+                values.put(COLUMN_AUTHOR,       data.get(JSON_KEY_AUTHOR));
+                values.put(COLUMN_AUTHOR_KEY,   data.get(JSON_KEY_AUTHOR_KEY));
+                values.put(COLUMN_MESSAGE,      data.get(JSON_KEY_MESSAGE));
+                values.put(COLUMN_DATE,         data.get(JSON_KEY_DATE));
                 getContentResolver().insert(SquawkProvider.SquawkMessages.CONTENT_URI,values);
                 return null;
             }
@@ -103,6 +128,7 @@ public class SquawkFirebaseMessagingService extends FirebaseMessagingService {
         if (message.length() > NOTIFICATION_MAX_CHARACTERS) {
             message = message.substring(0, NOTIFICATION_MAX_CHARACTERS) + "\u2026";
         }
+        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.test)
                 .setContentTitle(author)
@@ -112,6 +138,7 @@ public class SquawkFirebaseMessagingService extends FirebaseMessagingService {
                         .bigText("Much longer text that cannot fit one line..."))
                 // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingIntent)
+                .setSound(defaultSoundUri)
                 .setAutoCancel(true);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
