@@ -32,6 +32,7 @@ public class SquawkFirebaseMessagingService extends FirebaseMessagingService {
     private static final String JSON_KEY_AUTHOR_KEY =   COLUMN_AUTHOR_KEY;
     private static final String JSON_KEY_MESSAGE =      COLUMN_MESSAGE;
     private static final String JSON_KEY_DATE =         COLUMN_DATE;
+    private static final int NOTIFICATION_MAX_CHARACTERS = 40;
 
 
     //  (2) As part of the new Service - Override onMessageReceived. This method will
@@ -97,7 +98,11 @@ public class SquawkFirebaseMessagingService extends FirebaseMessagingService {
         String author = data.get(JSON_KEY_AUTHOR);
         String message = data.get(JSON_KEY_MESSAGE) ;
 
-
+        // If the message is longer than the max number of characters we want in our
+        // notification, truncate it and add the unicode character for ellipsis
+        if (message.length() > NOTIFICATION_MAX_CHARACTERS) {
+            message = message.substring(0, NOTIFICATION_MAX_CHARACTERS) + "\u2026";
+        }
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.test)
                 .setContentTitle(author)
